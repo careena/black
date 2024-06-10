@@ -249,10 +249,17 @@ class Mode:
         except those in UNSTABLE_FEATURES are enabled. Any features in
         `self.enabled_features` are also enabled.
         """
+        coverage = {i: False for i in range(3)}
         if self.unstable:
+            coverage[0] = True
+            print("Coverage: "+str(coverage))
             return True
         if feature in self.enabled_features:
+            coverage[1] = True
+            print("Coverage: "+str(coverage))
             return True
+        coverage[2] = True
+        print("Coverage: "+str(coverage))    
         return self.preview and feature not in UNSTABLE_FEATURES
 
     def get_cache_key(self) -> str:
