@@ -263,14 +263,18 @@ class Mode:
         return self.preview and feature not in UNSTABLE_FEATURES
 
     def get_cache_key(self) -> str:
+        coverage = {i: False for i in range(5)}
         if self.target_versions:
+            coverage[0] = True
             version_str = ",".join(
                 str(version.value)
                 for version in sorted(self.target_versions, key=attrgetter("value"))
             )
         else:
+            coverage[1] = True
             version_str = "-"
         if len(version_str) > _MAX_CACHE_KEY_PART_LENGTH:
+            coverage[2] = True
             version_str = sha256(version_str.encode()).hexdigest()[
                 :_MAX_CACHE_KEY_PART_LENGTH
             ]
@@ -280,6 +284,7 @@ class Mode:
             + ",".join(sorted(self.python_cell_magics))
         )
         if len(features_and_magics) > _MAX_CACHE_KEY_PART_LENGTH:
+            coverage[4] = True
             features_and_magics = sha256(features_and_magics.encode()).hexdigest()[
                 :_MAX_CACHE_KEY_PART_LENGTH
             ]
@@ -294,4 +299,6 @@ class Mode:
             str(int(self.preview)),
             features_and_magics,
         ]
+        coverage[5] = True
+        print("Coverage: " + str(coverage))
         return ".".join(parts)
